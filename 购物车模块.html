@@ -1,0 +1,124 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>购物车页面</title>  
+    <link rel="stylesheet" href="styles.css">  
+</head>  
+<style>
+    body {  
+    font-family: Arial, sans-serif;  
+    background-color: #f4f4f4;  
+    margin: 0;  
+    padding: 20px;  
+}  
+  
+.container {  
+    max-width: 800px;  
+    margin: 0 auto;  
+    background-color: #fff;  
+    padding: 20px;  
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+    border-radius: 8px;  
+}  
+  
+h1 {  
+    text-align: center;  
+}  
+  
+.cart-items {  
+    display: flex;  
+    flex-direction: column;  
+    gap: 20px;  
+}  
+  
+.cart-item {  
+    display: flex;  
+    align-items: center;  
+    gap: 20px;  
+    padding: 10px;  
+    border: 1px solid #ddd;  
+    border-radius: 8px;  
+    background-color: #fafafa;  
+}  
+  
+.product-image {  
+    width: 100px;  
+    height: 100px;  
+    object-fit: cover;  
+    border-radius: 8px;  
+}  
+  
+.item-details {  
+    flex: 1;  
+}  
+  
+.item-details h2 {  
+    margin: 0 0 5px;  
+}  
+  
+.item-details p {  
+    margin: 0;  
+}  
+  
+.label {  
+    margin-right: 10px;  
+}  
+  
+.total-price {  
+    text-align: center;  
+    margin-top: 20px;  
+}  
+  
+#checkout-btn {  
+    display: block;  
+    width: 100%;  
+    max-width: 200px;  
+    margin: 20px auto 0;  
+    padding: 10px;  
+    background-color: #28a745;  
+    color: #fff;  
+    border: none;  
+    border-radius: 8px;  
+    cursor: pointer;  
+    font-size: 16px;  
+}  
+  
+#checkout-btn:hover {  
+    background-color: #218838;  
+}
+</style>
+<body>  
+    <div class="container">  
+        <h1>购物车</h1>  
+        <div class="cart-items">  
+            <div class="cart-item">  
+                <img src="product1.jpg" alt="商品1" class="product-image">  
+                <div class="item-details">  
+                    <h2>商品名称1</h2>  
+                    <p>价格: <span class="price">$29.99</span></p>  
+                    <label for="quantity1">数量:</label>  
+                    <input type="number" id="quantity1" name="quantity1" value="1" min="1">  
+                </div>  
+            </div>  
+            <div class="cart-item">  
+                <img src="product2.jpg" alt="商品2" class="product-image">  
+                <div class="item-details">  
+                    <h2>商品名称2</h2>  
+                    <p>价格: <span class="price">$19.99</span></p>  
+                    <label for="quantity2">数量:</label>  
+                    <input type="number" id="quantity2" name="quantity2" value="1" min="1">  
+                </div>  
+            </div>  
+            <!-- 可以添加更多商品项 -->  
+        </div>  
+        <div class="total-price">  
+            <h2>总价: <span id="total">$0.00</span></h2>  
+        </div>  
+        <button id="checkout-btn">结账</button>  
+    </div>  
+  
+    <script src="script.js"></script>  
+</body>  
+</html>
