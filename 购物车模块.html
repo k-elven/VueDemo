@@ -3,8 +3,7 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>购物车页面</title>  
-    <link rel="stylesheet" href="styles.css">  
+    <title>购物车页面</title>   
 </head>  
 <style>
     body {  
@@ -88,37 +87,132 @@ h1 {
 #checkout-btn:hover {  
     background-color: #218838;  
 }
+.none{
+    width: 800px;
+    color: red;
+    background-color: gray;
+}
 </style>
 <body>  
-    <div class="container">  
-        <h1>购物车</h1>  
-        <div class="cart-items">  
-            <div class="cart-item">  
-                <img src="product1.jpg" alt="商品1" class="product-image">  
-                <div class="item-details">  
-                    <h2>商品名称1</h2>  
-                    <p>价格: <span class="price">$29.99</span></p>  
-                    <label for="quantity1">数量:</label>  
-                    <input type="number" id="quantity1" name="quantity1" value="1" min="1">  
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+
+    <div id="app">
+        <div class="container">  
+            <h1>购物车</h1>  
+            <div class="cart-items" v-if="list.length > 0"> 
+                <!--  -->
+                <div class="cart-item" v-for="(item,index) in list" :key="item.id" >  
+                    <img src="product1.jpg" alt="商品1" class="product-image">  
+                    <div class="item-details">  
+                        <h2>{{item.pdname}}</h2> 
+
+                        <p>价格: <span class="price">{{item.pdprice}}</span></p> 
+
+                        <button @click="Add(item.id)">+</button>
+
+                        <label for="quantity1">{{item.pdnum}}</label>  
+
+                        <button :disabled="item.pdnum <= 1" @click="Reduce(item.id)">-</button>
+
+                        <input type="checkbox" v-model="item.IsCheckout">
+
+                        <button @click="Delpd(item.id)">删除</button>
+                    </div>  
                 </div>  
+
+                <!-- 可以添加更多商品项 -->  
+
             </div>  
-            <div class="cart-item">  
-                <img src="product2.jpg" alt="商品2" class="product-image">  
-                <div class="item-details">  
-                    <h2>商品名称2</h2>  
-                    <p>价格: <span class="price">$19.99</span></p>  
-                    <label for="quantity2">数量:</label>  
-                    <input type="number" id="quantity2" name="quantity2" value="1" min="1">  
-                </div>  
+
+            <div class="none" v-else>
+                <p>无数据</p>
+            </div>
+
+
+            <div class="total-price">  
+
+                <h2>总价: <span id="total">{{TotalPrice}}</span></h2>  
+                <h2>总数：<span>{{TotalCount}}</span></h2>
+
+                <input type="checkbox" v-model="IsAll">
+
+                <span>全选</span>
             </div>  
-            <!-- 可以添加更多商品项 -->  
-        </div>  
-        <div class="total-price">  
-            <h2>总价: <span id="total">$0.00</span></h2>  
-        </div>  
-        <button id="checkout-btn">结账</button>  
-    </div>  
+
+
+            <button id="checkout-btn">结账</button>    
+    
+        </div> 
+    </div> 
   
-    <script src="script.js"></script>  
+    <script>
+        const defaultList =  [
+                    {id:1,pdname:'笔记本电脑',pdprice:6666,pdnum:1,IsCheckout:true},
+                    {id:2,pdname:'洗衣机',pdprice:666,pdnum:1,IsCheckout:true},
+                    {id:3,pdname:'手机',pdprice:16666,pdnum:1,IsCheckout:true},
+                    {id:4,pdname:'电饭煲',pdprice:566,pdnum:1,IsCheckout:true}
+                ]
+        const app = new Vue({
+            el:'#app',
+            data:{
+                list : JSON.parse(localStorage.getItem('list')) || defaultList
+            },
+            computed:{
+                //复选框的全选和反选
+                IsAll:{
+                    get(){
+                        return this.list.every(item => item.IsCheckout)
+                },
+                    set(value){
+                        return this.list.forEach(item => item.IsCheckout = value)
+                    }
+                },
+                //统计总数量
+                TotalCount(){
+                    return this.list.reduce((sum,item) => {
+                        if(item.IsCheckout){
+                            return sum + item.pdnum
+                        }else{
+                            return sum
+                        }
+                    },0)
+                },
+                //统计总金额
+                TotalPrice(){
+                    return this.list.reduce((sum,item) => {
+                        if(item.IsCheckout){
+                            return sum + item.pdnum * item.pdprice
+                        }else{
+                            return sum
+                        }
+                    },0)
+                }
+                
+            },
+            methods:{
+                //删除商品
+                Delpd(ID){
+                    this.list = this.list.filter(item => item.id !== ID)
+                },
+                //商品数量的增加与删除
+                Add(Id){
+                    const ControlPdNum = this.list.find(item => item.id === Id)
+                    ControlPdNum.pdnum++
+                },
+                Reduce(Id){
+                    const ControlPdNum = this.list.find(item => item.id === Id)
+                    ControlPdNum.pdnum--                    
+                },
+            },
+            watch:{
+                list:{
+                    deep:true,
+                    handle(newValue){
+                        localStorage.setItem('list',JSON.stringify(newValue))
+                    }
+                }
+            }
+        })
+    </script>  
 </body>  
 </html>
