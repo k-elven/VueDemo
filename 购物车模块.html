@@ -15,7 +15,7 @@
   
 .container {  
     max-width: 800px;  
-    margin: 0 auto;  
+    /* margin: 0 auto;   */
     background-color: #fff;  
     padding: 20px;  
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
@@ -92,9 +92,16 @@ h1 {
     color: red;
     background-color: gray;
 }
+.echarts-box{
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    margin-top: 30px;
+}
 </style>
 <body>  
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
 
     <div id="app">
         <div class="container">  
@@ -102,7 +109,7 @@ h1 {
             <div class="cart-items" v-if="list.length > 0"> 
                 <!--  -->
                 <div class="cart-item" v-for="(item,index) in list" :key="item.id" >  
-                    <img src="product1.jpg" alt="商品1" class="product-image">  
+                    <img :src=item.picture alt="商品1" class="product-image">  
                     <div class="item-details">  
                         <h2>{{item.pdname}}</h2> 
 
@@ -140,17 +147,17 @@ h1 {
             </div>  
 
 
-            <button id="checkout-btn">结账</button>    
+            <button id="checkout-btn" @click="CheckOut">结账</button>    
     
         </div> 
+        <div class="echarts-box" id="main" style="width: 600px;height:400px;"></div>
     </div> 
-  
     <script>
         const defaultList =  [
-                    {id:1,pdname:'笔记本电脑',pdprice:6666,pdnum:1,IsCheckout:true},
-                    {id:2,pdname:'洗衣机',pdprice:666,pdnum:1,IsCheckout:true},
-                    {id:3,pdname:'手机',pdprice:16666,pdnum:1,IsCheckout:true},
-                    {id:4,pdname:'电饭煲',pdprice:566,pdnum:1,IsCheckout:true}
+                    {id:1,pdname:'笔记本电脑',pdprice:6666,pdnum:1,IsCheckout:true,picture: 'https://yanxuan-item.nosdn.127.net/84a59ff9c58a77032564e61f716846d6.jpg'},
+                    {id:2,pdname:'洗衣机',pdprice:666,pdnum:1,IsCheckout:true,picture: 'https://yanxuan-item.nosdn.127.net/3346b7b92f9563c7a7e24c7ead883f18.jpg',},
+                    {id:3,pdname:'手机',pdprice:16666,pdnum:1,IsCheckout:true,picture: 'https://yanxuan-item.nosdn.127.net/2d942d6bc94f1e230763e1a5a3b379e1.png'},
+                    {id:4,pdname:'电饭煲',pdprice:566,pdnum:1,IsCheckout:true,picture: 'https://yanxuan-item.nosdn.127.net/44e51622800e4fceb6bee8e616da85fd.png'}
                 ]
         const app = new Vue({
             el:'#app',
@@ -164,7 +171,7 @@ h1 {
                         return this.list.every(item => item.IsCheckout)
                 },
                     set(value){
-                        return this.list.forEach(item => item.IsCheckout = value)
+                        return this.list.forEach(item => item.IsCheckout = value)   
                     }
                 },
                 //统计总数量
@@ -189,26 +196,71 @@ h1 {
                 }
                 
             },
+            mounted(){
+                this.myChart = echarts.init(document.querySelector('#main'))
+                this.updateChartData()
+            },
             methods:{
                 //删除商品
                 Delpd(ID){
                     this.list = this.list.filter(item => item.id !== ID)
+                    this.updateChartData();
                 },
                 //商品数量的增加与删除
                 Add(Id){
                     const ControlPdNum = this.list.find(item => item.id === Id)
                     ControlPdNum.pdnum++
+                    this.updateChartData();
                 },
                 Reduce(Id){
                     const ControlPdNum = this.list.find(item => item.id === Id)
-                    ControlPdNum.pdnum--                    
+                    ControlPdNum.pdnum-- 
+                    this.updateChartData();                
                 },
+                CheckOut(){
+                    alert(`结账总金额：${this.TotalPrice}`)
+                },
+                //图表
+                updateChartData(){
+                    const char  = this.list.map(item => ({value: item.pdprice * item.pdnum , name:item.pdname}))
+                    this.myChart.setOption({
+                        title: {
+                          text: '消费比例',
+                          subtext: '仅供参考',
+                          left: 'center'
+                        },
+                        tooltip: {
+                          trigger: 'item'
+                        },
+                        legend: {
+                          orient: 'vertical',
+                          left: 'left'
+                        },
+                        series: [
+                          {
+                            name: '产品',
+                            type: 'pie',
+                            radius: '50%',
+                            data: char,
+                            emphasis: {
+                              itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                              }
+                            }
+                          }
+                        ]
+                })
+                }
+               
             },
             watch:{
                 list:{
                     deep:true,
                     handle(newValue){
                         localStorage.setItem('list',JSON.stringify(newValue))
+                        this.updateChartData();
                     }
                 }
             }
